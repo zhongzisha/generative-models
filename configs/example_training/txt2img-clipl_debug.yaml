@@ -73,7 +73,7 @@ model:
     first_stage_config:
       target: sgm.models.autoencoder.AutoencoderKL
       params:
-        ckpt_path: CKPT_PATH
+        ckpt_path: /data/zhongz2/data/sdxl-vae/sdxl_vae.safetensors
         embed_dim: 4
         monitor: val/rec_loss
         ddconfig:
@@ -124,10 +124,10 @@ data:
       datapipeline:
         urls:
           # USER: adapt this path the root of your custom dataset
-          - "/data/zhongz2/data/fake_dataset/"
+          - "./caltech"
         pipeline_config:
-          shardshuffle: 10000
-          sample_shuffle: 10000
+          shardshuffle: 1000
+          sample_shuffle: 1000
 
 
         decoders:
@@ -144,13 +144,13 @@ data:
                     interpolation: 3
                 - target: torchvision.transforms.ToTensor
           - target: sdata.mappers.Rescaler
-            # USER: you might wanna use non-default parameters due to your custom dataset
           - target: sdata.mappers.AddOriginalImageSizeAsTupleAndCropToSquare
-            # USER: you might wanna use non-default parameters due to your custom dataset
-
+            params:
+              h_key: height
+              w_key: width
       loader:
         batch_size: 64
-        num_workers: 6
+        num_workers: 4
 
 lightning:
   modelcheckpoint:
@@ -177,7 +177,7 @@ lightning:
           n_rows: 2
 
   trainer:
-    devices: 0,
+    devices: 0,1
     benchmark: True
     num_sanity_val_steps: 0
     accumulate_grad_batches: 1

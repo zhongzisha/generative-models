@@ -827,20 +827,25 @@ if __name__ == "__main__":
         trainer.logdir = logdir  ###
 
         # data
+        print('before data')
         data = instantiate_from_config(config.data)
+        print('after data')
         # NOTE according to https://pytorch-lightning.readthedocs.io/en/latest/datamodules.html
         # calling these ourselves should not be necessary but it is.
         # lightning still takes care of proper multiprocessing though
         data.prepare_data()
-        # data.setup()
-        print("#### Data #####")
-        try:
-            for k in data.datasets:
-                print(
-                    f"{k}, {data.datasets[k].__class__.__name__}, {len(data.datasets[k])}"
-                )
-        except:
-            print("datasets not yet initialized.")
+        print('after prepare_data()')
+        data.setup(stage="")
+        # import pdb
+        # pdb.set_trace()
+        # print("#### Data #####")
+        # if True: #try:
+        #     for k in data.datasets:
+        #         print(
+        #             f"{k}, {data.datasets[k].__class__.__name__}, {len(data.datasets[k])}"
+        #         )
+        # else: # except:
+        #     print("datasets not yet initialized.")
 
         # configure learning rate
         if "batch_size" in config.data.params:
@@ -915,11 +920,11 @@ if __name__ == "__main__":
             device = os.environ.get("CUDA_VISIBLE_DEVICES", "?")
             hostname = socket.gethostname()
             ts = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-            resp = requests.get("http://169.254.169.254/latest/meta-data/instance-id")
-            print(
-                f"ERROR at {ts} on {hostname}/{resp.text} (CUDA_VISIBLE_DEVICES={device}): {type(err).__name__}: {err}",
-                flush=True,
-            )
+            # resp = requests.get("http://169.254.169.254/latest/meta-data/instance-id")
+            # print(
+            #     f"ERROR at {ts} on {hostname}/{resp.text} (CUDA_VISIBLE_DEVICES={device}): {type(err).__name__}: {err}",
+            #     flush=True,
+            # )
         raise err
     except Exception:
         if opt.debug and trainer.global_rank == 0:

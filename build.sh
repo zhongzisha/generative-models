@@ -1,8 +1,12 @@
 # build xformers
 git clone https://github.com/facebookresearch/xformers
 cd xformers
+git tag
+git checkout v0.0.20
+git submodule update --init --recursive
 export TORCH_CUDA_ARCH_LIST="7.0 7.2 7.5 8.0 8.6 8.7"
-pip install -e . -vvv
+export TORCH_CUDA_ARCH_LIST="7.0 7.2 7.5"
+MAX_JOBS=16 pip install -e . -vvv
 
 
 # build DeepSpeed
@@ -22,12 +26,14 @@ DS_BUILD_SPARSE_ATTN=0 \
 MAX_JOBS=16 pip install -e . --global-option="build_ext" --global-option="-j16"
 
 
-CUDA_VISIBLE_DEVICES=0 \
-python main.py --base configs/example_training/txt2img-clipl_debug.yaml
+CUDA_VISIBLE_DEVICES=0,1 \
+python main.py --base configs/example_training/txt2img-clipl_debug.yaml --debug --scale_lr
 
 
+# rustup show    # list the installed versions
+# rustup default [version]
 
-
+# conda list --revisions
 
 
 
